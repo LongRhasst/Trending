@@ -9,8 +9,9 @@ from alembic import context
 from app.core.config import Settings
 
 # Import Base and all models
-from app.api.Dependences import Base
-from app.api.v1.user.models import User  # Import all your models here
+from app.core.database import Base
+from app.api.v1.user.models import User
+from app.api.v1.auth.models import refreshToken
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

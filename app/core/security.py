@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Optional
+import secrets
+import hashlib
+from sqlalchemy.ext.asyncio import AsyncSession
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from app.core.config import settings
@@ -59,6 +62,40 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+async def create_refresh_token(
+    data: dict,
+    expires_delta: Optional[timedelta] = None,
+    user_agent: Optional[str] = None,
+    ip: Optional[str] = None,
+) -> str:
+    from app.core.database import AsyncSessionLocal
+    
+    # Generate a secure random token (64 bytes -> 128 hex chars to match previous length)
+    refresh_token_raw = secrets.token_hex(64)
+
+    # Hash the token before storing
+    refresh_token_hash = hashlib.sha256(refresh_token_raw.encode("utf-8")).hexdigest()
+
+    expires_at = datetime.utcnow() + (expires_delta if expires_delta else timedelta(days=30))
+
+    # Lazy import of model to avoid circular imports at module import time
+    from app.api.v1.auth.models import refreshToken as RefreshTokenModel
+
+    # Create and persist the refresh token record with own session
+    async with AsyncSessionLocal() as db_session:
+        new_token = RefreshTokenModel(
+            user_id=data.get("user_id"),
+            token_hash=refresh_token_hash,
+            expires_at=expires_at,
+            revoked=False,
+            user_agent=user_agent,
+            ip=ip,
+        )
+        db_session.add(new_token)
+        await db_session.commit()
+        await db_session.refresh(new_token)
+
+    return refresh_token_raw
 
 def decode_access_token(token: str) -> Optional[dict]:
     """Decode JWT access token"""

@@ -41,11 +41,15 @@ class SignInSchema(BaseModel):
             return None
         return v
     
-    def model_post_init(self):
+    def model_post_init(self, __context):
         """Validate that at least one of email or username is provided"""
         if not self.email and not self.username:
             raise ValueError("Either email or username must be provided")
 
 class SignInResponseSchema(BaseModel):
     access_token: str
+    refresh_token: Optional[str] = None
     token_type: str = "bearer"
+
+class RefreshTokenSchema(BaseModel):
+    refresh_token: str = Field(..., min_length=1)

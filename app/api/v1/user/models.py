@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from app.api.Dependences import Base
+from app.core.database import Base
 
 class TimeStampMixin:
     """Mixin for timestamp fields"""
@@ -18,3 +19,7 @@ class User(Base, TimeStampMixin):
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    
+    # Relationship to refresh tokens
+    refresh_tokens = relationship("refreshToken", back_populates="user")
+    
