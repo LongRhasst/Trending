@@ -10,7 +10,7 @@ DATABASE_URL = (
     f"{settings.DATABASE_PORT}/"
     f"{settings.DATABASE_NAME}"
 )
-engine = create_async_engine(DATABASE_URL, echo=True)
+engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = sessionmaker(
     bind=engine,
     class_=AsyncSession,

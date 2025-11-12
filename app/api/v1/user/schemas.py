@@ -1,11 +1,11 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime
 
 class SignUpSchema(BaseModel):
-    username: str
+    username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=72)
 
 class SignUpResponseSchema(BaseModel):
     id: int
@@ -18,7 +18,7 @@ class SignUpResponseSchema(BaseModel):
 
 class SignInSchema(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=72)
 
 class SignInResponseSchema(BaseModel):
     access_token: str
