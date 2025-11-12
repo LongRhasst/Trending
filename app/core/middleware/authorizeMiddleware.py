@@ -4,7 +4,18 @@ from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoin
 from starlette.status import HTTP_401_UNAUTHORIZED
 from app.core.security import verify_token
 
-public_routes = ["/public", "/docs", "/openapi.json", "/auth"]
+"""Paths that should be accessible without an Authorization header.
+
+Note: frontend requests to the auth endpoints (e.g. /api/v1/auth/login)
+must be allowed so CORS preflight and login requests are not blocked by
+the authorization middleware. Add API prefixes used by the routers here.
+"""
+public_routes = [
+    # "/public",
+    "/docs",
+    "/api/v1/openapi.json",
+    "/api/v1/auth",
+]
 
 class AuthorizeMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
