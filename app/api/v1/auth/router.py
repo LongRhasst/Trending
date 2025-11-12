@@ -32,6 +32,17 @@ async def register(
     db: AsyncSession = Depends(get_db)
 ):
     """Register endpoint"""
-    auth_service = AuthService(db)
-    result = await auth_service.register_user(user_data)
-    return result
+    try:
+        auth_service = AuthService(db)
+        result = await auth_service.register_user(user_data)
+        return result
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An error occurred during registration: {str(e)}"
+        )

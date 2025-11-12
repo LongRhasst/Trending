@@ -19,7 +19,14 @@ class UserRepository:
         self.db_session.add(new_user)
         await self.db_session.commit()
         await self.db_session.refresh(new_user)
-        return new_user
+        
+        # Return proper response schema
+        return SignUpResponseSchema(
+            id=new_user.id,
+            username=new_user.username,
+            email=new_user.email,
+            created_at=new_user.created_at
+        )
     
     async def get_user_by_email(self, email: str) -> User:
         """Get user by email address"""
