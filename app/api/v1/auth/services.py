@@ -14,14 +14,21 @@ class AuthService:
 
     async def login_user(self, login_data: SignInSchema) -> SignInResponseSchema:
         """Authenticate user and return access token"""
-        # Get user by email
-        user = await self.user_service.get_user_by_email(login_data.email)
+        # Get user by email or username
+        user = await self.user_service.user_repository.get_user_by_email_or_username(
+            email=login_data.email,
+            username=login_data.username
+        )
         
         if not user or not verify_password(login_data.password, user.hashed_password):
             return None
         
-        # Create access token
-        access_token = create_access_token(data={"sub": user.email})
+        # Create access token with user's email and username
+        access_token = create_access_token(data={
+            "sub": user.email,
+            "username": user.username,
+            "user_id": user.id
+        })
         
         return SignInResponseSchema(
             access_token=access_token,

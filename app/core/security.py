@@ -8,7 +8,7 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings
-SECRET_KEY = getattr(settings, 'SECRET_KEY', "your-secret-key-here-change-in-production")
+SECRET_KEY = getattr(settings, 'SECRET_KEY')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -39,6 +39,13 @@ def hash_password(password: str) -> str:
     password = _truncate_password(password)
     return pwd_context.hash(password)
 
+def verify_token(token: str) -> Optional[dict]:
+    """Verify JWT token and return the payload or None if invalid"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        return None
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Create JWT access token"""

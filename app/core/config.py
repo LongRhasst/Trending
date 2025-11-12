@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
+    # Default admin user
+    username: str = "admin"
+    password: str = "admin123"
+    email: str = "admin@example.com"
+    
     model_config = ConfigDict(
         env_file=".env",
         case_sensitive=True,

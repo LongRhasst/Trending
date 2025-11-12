@@ -34,3 +34,28 @@ class UserRepository:
             select(User).where(User.email == email)
         )
         return result.scalars().first()
+    
+    async def get_user_by_username(self, username: str) -> User:
+        """Get user by username"""
+        result = await self.db_session.execute(
+            select(User).where(User.username == username)
+        )
+        return result.scalars().first()
+    
+    async def get_user_by_email_or_username(self, email: str = None, username: str = None) -> User:
+        """Get user by email or username"""
+        if email:
+            result = await self.db_session.execute(
+                select(User).where(User.email == email)
+            )
+            user = result.scalars().first()
+            if user:
+                return user
+        
+        if username:
+            result = await self.db_session.execute(
+                select(User).where(User.username == username)
+            )
+            return result.scalars().first()
+        
+        return None
